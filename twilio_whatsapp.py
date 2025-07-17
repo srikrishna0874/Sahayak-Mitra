@@ -5,6 +5,9 @@ import os
 
 load_dotenv()
 
+
+# todo: Use python-dotenv to load environment variables
+# Ensure you have a .env file with the following variables: 
 account_sid = os.getenv('ACCOUNT_SID')
 auth_token = os.getenv('AUTH_TOKEN')
 twilio_whatsapp_number = os.getenv('TWILIO_WHATSAPP_NUMBER')
@@ -31,4 +34,5 @@ def reply():
     print(userNumber)
     
 if __name__ == '__main__':
+    # send_whatsapp_message('+917569105854', "Hello! This is a test message from Sahayak Mitra.")
     app.run(debug=True)
