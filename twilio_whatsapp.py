@@ -1,13 +1,18 @@
 from twilio.rest import Client
 from flask import Flask, request
+from dotenv import load_dotenv
+import os
 
-account_sid = 'AC3a58d503e76de9ee36a49fb7c9ba5b0c'
-auth_token = '7cdbd52c2ae03e0d3dfce73459762277'
+load_dotenv()
+
+account_sid = os.getenv('ACCOUNT_SID')
+auth_token = os.getenv('AUTH_TOKEN')
+twilio_whatsapp_number = os.getenv('TWILIO_WHATSAPP_NUMBER')
 client = Client(account_sid, auth_token)
 
 def send_whatsapp_message(to,body):
     message = client.messages.create(
-        from_='whatsapp:+14155238886',
+        from_=twilio_whatsapp_number,
         body=body,
         to=f'whatsapp:{to}'
     )
@@ -26,6 +31,6 @@ def reply():
     print(userNumber)
     
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
 
 print(send_whatsapp_message('+917569105854', 'Is it working fine?'))
