@@ -32,5 +32,3 @@ def reply():
     
 if __name__ == '__main__':
     app.run(debug=True)
-
-print(send_whatsapp_message('+917569105854', 'Is it working fine?'))
