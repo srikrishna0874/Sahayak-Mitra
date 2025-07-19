@@ -1,5 +1,6 @@
 from twilio.rest import Client
-from flask import Flask, request
+from flask import Flask, request, Response
+from twilio.twiml.messaging_response import MessagingResponse 
 from dotenv import load_dotenv
 import os
 
@@ -25,14 +26,18 @@ def send_whatsapp_message(to,body):
 
 app=Flask(__name__)
 
-@app.route('/sms',methods=['POST','GET'])
+@app.route('/webhook',methods=['POST','GET'])
 def reply():
     print("Received a message")
     userResponse=request.values.get('Body')
     userNumber=request.values.get('From')
     print(userResponse)
     print(userNumber)
+    response= MessagingResponse()
+    response.message(f"Hello! You said: {userResponse}")
+    return str(response)
+    
     
 if __name__ == '__main__':
     # send_whatsapp_message('+917569105854', "Hello! This is a test message from Sahayak Mitra.")
-    app.run(debug=True,port=3000)
+    app.run(debug=True,port=5000)
