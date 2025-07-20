@@ -4,6 +4,8 @@ from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 import os
 
+from router import getResponse
+
 load_dotenv()
 
 
@@ -29,15 +31,20 @@ app=Flask(__name__)
 @app.route('/webhook',methods=['POST','GET'])
 def reply():
     print("Received a message")
-    userResponse=request.values.get('Body')
+    userResponse=request.values.get('Body') 
+    responseString=getResponse(userResponse)
+    print(request.values)
     userNumber=request.values.get('From')
     print(userResponse)
     print(userNumber)
     response= MessagingResponse()
-    response.message(f"Hello! You said: {userResponse}")
+    response.message(responseString)
     return str(response)
     
     
 if __name__ == '__main__':
     # send_whatsapp_message('+917569105854', "Hello! This is a test message from Sahayak Mitra.")
-    app.run(debug=True,port=5000)
+    # port = int(os.environ.get("PORT", 8080))  # Cloud Run uses PORT env variable
+    # app.run(host="0.0.0.0", port=port)
+    
+    app.run(debug=True,port=5000)  # Run locally on port 5000 for testing
