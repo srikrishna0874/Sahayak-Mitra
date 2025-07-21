@@ -52,4 +52,4 @@ if __name__ == '__main__':
     # port = int(os.environ.get("PORT", 8080))  # Cloud Run uses PORT env variable
     # app.run(host="0.0.0.0", port=port)
     
-    app.run(debug=True,port=5000,host='localhost')  # Run locally on port 5000 for testing
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))  # Run locally on port 5000 for testing
