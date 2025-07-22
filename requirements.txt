@@ -2,3 +2,4 @@ twilio
 flask
 dotenv
 firebase-admin
+google-genai

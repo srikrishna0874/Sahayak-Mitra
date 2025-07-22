@@ -3,6 +3,7 @@ from flask import Flask, request, Response
 from twilio.twiml.messaging_response import MessagingResponse 
 from dotenv import load_dotenv
 import os
+from googlesearch import search
 
 from router import getResponse
 
@@ -36,6 +37,7 @@ def index():
 def reply():
     print("Received a message")
     userResponse=request.values.get('Body') 
+    print("User response:", userResponse)
     responseString=getResponse(userResponse)
     
     print(request.values)
