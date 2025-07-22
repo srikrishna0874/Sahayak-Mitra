@@ -3,7 +3,6 @@ from flask import Flask, request, Response
 from twilio.twiml.messaging_response import MessagingResponse 
 from dotenv import load_dotenv
 import os
-from googlesearch import search
 
 from router import getResponse
 
