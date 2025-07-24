@@ -3,3 +3,13 @@ flask
 python-dotenv
 firebase-admin
 google-genai
+
+
+
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+Pillow
+IPython
+google-cloud-aiplatform
+vertexai
