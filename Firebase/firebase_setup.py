@@ -17,7 +17,7 @@ def upload_file_to_firebase(sender, content_type,file,file_extension,userWaId=No
     if sender == "user":
         destination_blob_name += "user/"+userWaId+"/"
     elif sender == "bot":
-        destination_blob_name += "bot/"
+        destination_blob_name += "bot/"+userWaId+"/"
     destination_blob_name += file_name
     print(f"Uploading file to {destination_blob_name} in Firebase Storage")
     blob = bucket.blob(destination_blob_name)
