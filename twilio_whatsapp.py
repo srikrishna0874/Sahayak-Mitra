@@ -7,7 +7,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from Firebase.firebase_setup import upload_file_to_firebase
 
-from router import getResponse
+import router
 
 load_dotenv()
 
@@ -54,6 +54,8 @@ def reply():
     userResponse=request.values.get('Body') 
     print("User response:", userResponse)
     print("Num media:- ", request.values.get('NumMedia'))
+    classification = router.classify_query(userResponse)
+    userNumber=request.values.get('From')
     if request.values.get('NumMedia') and int(request.values.get('NumMedia')) > 0:
         print("Received media message")
         media_urls = [request.values.get(f'MediaUrl{i}') for i in range(int(request.values.get('NumMedia')))]
@@ -68,14 +70,15 @@ def reply():
             print("Media URL:", media_url)
             
             if response.status_code == 200:
-                firebase_file_link=upload_file_to_firebase("user",content_type, response.content, file_extension, userWaId=request.values.get('From').split(':')[1])
+                firebase_file_link=upload_file_to_firebase("user",content_type, response.content, file_extension, userWaId=request.values.get('From').split(':')[1],userWaId=userNumber)
                 
                 print("File uploaded successfully")
-                send_media_message(request.values.get('From').split(':')[1], [firebase_file_link])
+                send_media_message(userNumber.split(':')[1], [firebase_file_link])
                 print("message sent successfully")
                 return Response(status=200)
                 
             else:
+                    
                 print("Response failed. Status code:", response.status_code)
             
             
@@ -84,13 +87,20 @@ def reply():
         responseString = "Received media: " + ", ".join(media_urls)
         
     else:
-        responseString='getResponse(userResponse)'
+        if classification == "image":
+            print("Calling image generation agent...")
+            responseString = router.generate_image(prompt=userResponse)
+            send_media_message(request.values.get('From').split(':')[1], [responseString])
+            responseString = "Image generated successfully and sent to you."
+        else:
+            responseString=router.getResult(userResponse)
     
     print(request.values)
-    userNumber=request.values.get('From')
+    
     print(userResponse)
     print(userNumber)    
     response= MessagingResponse()
+    print("Response string:", responseString)
     response.message(responseString)
     response.message("This is a test message from Sahayak Mitra.")
     return str(response)

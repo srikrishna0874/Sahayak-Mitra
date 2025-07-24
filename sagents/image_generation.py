@@ -10,6 +10,9 @@ from google.genai.types import GenerateContentConfig, HttpOptions
 from google import genai
 from google.genai import types
 from google.oauth2 import service_account
+import io
+
+from Firebase.firebase_setup import upload_file_to_firebase
 
 
 def authenticate():
@@ -86,8 +89,21 @@ def generate_image(prompt: str, number_of_images: int = 1, aspect_ratio: str = "
         aspect_ratio=aspect_ratio,
         add_watermark=add_watermark,
     )
-    save_image(images[0], "generated.png")
-    return "Image generated and saved as 'generated.png'"
+    # Suppose 'img' is a PIL Image object
+    #for ind,image in enumerate(images):
+        # print(f"Generated image {ind+1}:")
+        # if isinstance(image, PIL_Image.Image):
+        #     img_bytes = io.BytesIO()
+        #     image.save(img_bytes, format='PNG')
+        #     img_bytes.seek(0)
+        # else:
+        #     # Assume image is already bytes
+        #     img_bytes = io.BytesIO(image._image_bytes)
+    
+    ai_generated_image_link = upload_file_to_firebase("bot", "image/png", images[0]._image_bytes, "png")
+    print("Image uploaded to Firebase Storage:", ai_generated_image_link)
+    # save_image(images[0], "generated.png")
+    return ai_generated_image_link
 
 if __name__ == "__main__":
     authenticate()

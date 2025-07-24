@@ -48,9 +48,9 @@ def getResult(userQuery):
         return generate_response(userQuery)
 
 
-userQuery = "Give me an image to explain the water cycle concept to 5th grade students."
-responseString=getResult(userQuery)
-print(responseString)
+# userQuery = "Give me an image to explain the water cycle concept to 5th grade students."
+# responseString=getResult(userQuery)
+# print(responseString)
 
 
 
