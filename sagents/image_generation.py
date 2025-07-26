@@ -74,8 +74,10 @@ def refactorPrompt(prompt: str):
     )
     return response.text
 
-    return updatedPrompt
-def generate_image(prompt: str, number_of_images: int = 1, aspect_ratio: str = "1:1", add_watermark: bool = True):
+    #return updatedPrompt
+    
+    
+def generate_image(prompt: str, number_of_images: int = 1, aspect_ratio: str = "1:1", add_watermark: bool = True,userWaId=None) -> typing.List[str]:
     authenticate()
     print("User prompt: ", prompt)
     prompt = refactorPrompt(prompt)
@@ -100,16 +102,19 @@ def generate_image(prompt: str, number_of_images: int = 1, aspect_ratio: str = "
         #     # Assume image is already bytes
         #     img_bytes = io.BytesIO(image._image_bytes)
     
-    ai_generated_image_link = upload_file_to_firebase("bot", "image/png", images[0]._image_bytes, "png")
+    ai_generated_image_link = upload_file_to_firebase("bot", "image/png", images[0]._image_bytes, "png",userWaId=userWaId)
     print("Image uploaded to Firebase Storage:", ai_generated_image_link)
     # save_image(images[0], "generated.png")
     return ai_generated_image_link
 
-if __name__ == "__main__":
-    authenticate()
-    prompt = "Create a very simple, colorful illustration with large shapes and animals to teach the concept of 'big and small'. Show elephants and mice, trees and flowers, with clear size differences."
-    images = generate_image(prompt)
-    # display_image(images[0])
-    save_image(images[0], "generated.png")
+# if __name__ == "__main__":
+#     authenticate()
+#     prompt = "Create a very simple, colorful illustration with large shapes and animals to teach the concept of 'big and small'. Show elephants and mice, trees and flowers, with clear size differences."
+#     images = generate_image(prompt)
+#     print("Generated image link:", images)
+#     # display_image(images[0])
+#     #save_image(images[0], "generated.png")
+
+
 
     

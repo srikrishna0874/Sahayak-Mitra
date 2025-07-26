@@ -1,13 +1,14 @@
 from twilio.rest import Client
 from flask import Flask, request, Response
 from twilio.twiml.messaging_response import MessagingResponse 
+import Firebase.firebase_setup as firebase_setup
+# print(firebase_setup.credentials)
 from dotenv import load_dotenv
 import os
 import requests
 from requests.auth import HTTPBasicAuth
-from Firebase.firebase_setup import upload_file_to_firebase
-
 import router
+from sagents.image_analysis import generate_image_analysis
 
 load_dotenv()
 
@@ -52,10 +53,14 @@ def index():
 def reply():
     print("Received a message")
     userResponse=request.values.get('Body') 
+    # send_whatsapp_message(request.values.get('From').split(':')[1],userResponse)
     print("User response:", userResponse)
     print("Num media:- ", request.values.get('NumMedia'))
     classification = router.classify_query(userResponse)
     userNumber=request.values.get('From')
+    history=firebase_setup.get_recent_ten_messages(request.values.get('From').split(':')[1])
+    print("User number:", userNumber)
+      
     if request.values.get('NumMedia') and int(request.values.get('NumMedia')) > 0:
         print("Received media message")
         media_urls = [request.values.get(f'MediaUrl{i}') for i in range(int(request.values.get('NumMedia')))]
@@ -70,11 +75,24 @@ def reply():
             print("Media URL:", media_url)
             
             if response.status_code == 200:
-                firebase_file_link=upload_file_to_firebase("user",content_type, response.content, file_extension, userWaId=request.values.get('From').split(':')[1],userWaId=userNumber)
+                #send_whatsapp_message(request.values.get('From').split(':')[1], "Thanks for sharing the file. Let me process this. This usually 1-2 minutes. I will let you know when I am done.")   
+                firebase_file_link=firebase_setup.upload_file_to_firebase("user",content_type, response.content, file_extension, userWaId=request.values.get('From').split(':')[1])
                 
                 print("File uploaded successfully")
-                send_media_message(userNumber.split(':')[1], [firebase_file_link])
-                print("message sent successfully")
+                
+                print("Document inserted successfully")
+                # send_media_message(userNumber.split(':')[1], [firebase_file_link])
+                # print("Media message sent successfully")
+                
+                print("Image analysis started...")
+                responseString=router.generate_image_analysis(firebase_file_link,content_type)
+                print("Image analysis response:", responseString)
+                firebase_setup.insert_new_document_to_firestore(request.values.get('From').split(':')[1], "text", responseString , "dev")
+                send_whatsapp_message(request.values.get('From').split(':')[1], responseString)
+                
+                print("Response sent successfully")
+                
+                # print("message sent successfully")
                 return Response(status=200)
                 
             else:
@@ -87,13 +105,22 @@ def reply():
         responseString = "Received media: " + ", ".join(media_urls)
         
     else:
+        firebase_setup.insert_new_document_to_firestore(request.values.get('From').split(':')[1], "text", userResponse, "user")
+        print("No media received, processing text response...")
         if classification == "image":
             print("Calling image generation agent...")
-            responseString = router.generate_image(prompt=userResponse)
+            responseString = router.generate_image(prompt=userResponse, userWaId=request.values.get('From').split(':')[1])
             send_media_message(request.values.get('From').split(':')[1], [responseString])
+            print("Image generated and sent successfully.")
+            firebase_setup.insert_new_document_to_firestore(request.values.get('From').split(':')[1], "image", responseString, "bot")
+            print("Document inserted successfully")
             responseString = "Image generated successfully and sent to you."
         else:
-            responseString=router.getResult(userResponse)
+            responseString=router.getResult(userResponse,history)
+            list_of_messages= responseString.split("----")
+            print("List of messages:", list_of_messages)
+            firebase_setup.insert_new_document_to_firestore(request.values.get('From').split(':')[1], "text", responseString.replace("----","\n"), "bot")
+            
     
     print(request.values)
     
@@ -101,9 +128,12 @@ def reply():
     print(userNumber)    
     response= MessagingResponse()
     print("Response string:", responseString)
-    response.message(responseString)
-    response.message("This is a test message from Sahayak Mitra.")
-    return str(response)
+    for message in list_of_messages:
+        send_whatsapp_message(request.values.get('From').split(':')[1],message)
+    
+    #response.message(responseString)
+    # response.message("This is a test message from Sahayak Mitra.")
+    return Response(status=200)
 
 
     
@@ -114,5 +144,10 @@ if __name__ == '__main__':
     # app.run(host="0.0.0.0", port=port)
     
     
+    # print(generate_image_analysis("https://storage.googleapis.com/sahayak-mitra/Chat_files/bot/+919883219829/20250726165345.png"))
+
+
     
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))  # Run locally on port 5000 for testing
+    
+    
