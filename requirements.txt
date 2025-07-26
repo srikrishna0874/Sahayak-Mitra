@@ -3,9 +3,6 @@ flask
 python-dotenv
 firebase-admin
 google-genai
-
-
-
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
