@@ -8,7 +8,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 json_path = os.path.join(BASE_DIR, 'sahayak-mitra-firebase-adminsdk-fbsvc-649d91ea91.json')
 
-cred = credentials.Certificate(json_path)
+CREDENTIALS_PATH='/etc/secrets/Firebase/sahayak-mitra-firebase-adminsdk-fbsvc-649d91ea91.json'
+
+
+cred = credentials.Certificate(CREDENTIALS_PATH)
 firebase_admin.initialize_app(cred,{"storageBucket": "sahayak-mitra"})
 
 
