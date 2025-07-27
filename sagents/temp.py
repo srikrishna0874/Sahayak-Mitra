@@ -3,8 +3,10 @@ from google.genai import types
 from google.oauth2 import service_account
 from google.genai.types import GenerateContentConfig, HttpOptions
 
+CREDENTIALS_PATH='/etc/secrets/sahayak-mitra-89f74b79e0e1.json'
+
 credentials = service_account.Credentials.from_service_account_file(
-    "sahayak-mitra-89f74b79e0e1.json",
+    CREDENTIALS_PATH,
     scopes=["https://www.googleapis.com/auth/cloud-platform"])
 
 

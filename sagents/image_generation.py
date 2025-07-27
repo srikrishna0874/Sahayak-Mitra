@@ -1,16 +1,12 @@
 # from google.colab import auth
 import google.auth
 import typing
-import IPython.display
-from PIL import Image as PIL_Image
-from PIL import ImageOps as PIL_ImageOps
 import vertexai
 from vertexai.vision_models import ImageGenerationModel
 from google.genai.types import GenerateContentConfig, HttpOptions
 from google import genai
 from google.genai import types
 from google.oauth2 import service_account
-import io
 
 from Firebase.firebase_setup import upload_file_to_firebase
 
@@ -21,7 +17,7 @@ def authenticate():
     from google.auth.transport.requests import Request
     from google.oauth2.service_account import Credentials
     
-   
+    
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'sahayak-mitra-89f74b79e0e1.json'
     
     
@@ -36,15 +32,15 @@ def save_image(image, filename: str = "generated_image.png"):
     pil_image.save(filename)
     print(f"Image saved as: {filename}")
 
-def display_image(image, max_width: int = 600, max_height: int = 350) -> None:
-    """Display an image with a max size limitation."""
-    pil_image = image._pil_image  # Access PIL Image object
-    if pil_image.mode != "RGB":
-        pil_image = pil_image.convert("RGB")
-    image_width, image_height = pil_image.size
-    if max_width < image_width or max_height < image_height:
-        pil_image = PIL_ImageOps.contain(pil_image, (max_width, max_height))
-    IPython.display.display(pil_image)
+# def display_image(image, max_width: int = 600, max_height: int = 350) -> None:
+#     """Display an image with a max size limitation."""
+#     pil_image = image._pil_image  # Access PIL Image object
+#     if pil_image.mode != "RGB":
+#         pil_image = pil_image.convert("RGB")
+#     image_width, image_height = pil_image.size
+#     if max_width < image_width or max_height < image_height:
+#         pil_image = PIL_ImageOps.contain(pil_image, (max_width, max_height))
+#     IPython.display.display(pil_image)
 
 def refactorPrompt(prompt: str):
 
